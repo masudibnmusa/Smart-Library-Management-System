@@ -1,220 +1,245 @@
 # 📚 Library Management System
 
-A simple, browser-based Library Management System that allows users to add, search, borrow, and return books. All data is persisted locally using `localStorage`.
+A secure, role-based Library Management System built with **HTML5**, **CSS3**, and **Vanilla JavaScript**. The system provides user authentication, role-based access control, book management, and persistent browser storage using `localStorage`.
 
 ---
 
 ## ✨ Features
 
-### ➕ Add Books
-Register new books with:
-- Title
-- Author
-- Publication Year
-- ISBN Number
-
-### 🔍 Search Books
-Quickly find books by:
-- Title
-- Author
-
-### 📖 Borrow & Return
-Manage book availability:
-- Borrow available books
-- Return issued books
-- View current status instantly
-
-### 🗑️ Delete Books
-Remove books from the collection with a confirmation prompt.
-
-### 💾 Persistent Storage
-All data is saved in the browser using `localStorage`, so your library remains available after refreshing the page.
-
-### 📱 Responsive Design
-Optimized for:
-- Desktop
-- Tablet
-- Mobile Devices
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Google Chrome, Firefox, Safari, Edge, or any modern browser
-- No installation or server setup required
-
-### Installation
-
-1. Clone or download the repository.
-2. Open `index.html` in your browser.
-3. Start managing your library.
-
-```bash
-git clone https://github.com/yourusername/library-management-system.git
-cd library-management-system
-```
-
-Then simply open:
-
-```text
-index.html
-```
-
----
-
-## 🖼️ Application Features
-
 | Feature | Description |
 |----------|-------------|
-| Add Book | Add a new book with title, author, year, and ISBN |
-| Search | Search books instantly by title or author |
-| Borrow | Mark a book as issued |
-| Return | Mark a book as available again |
-| Delete | Permanently remove a book from the collection |
+| 🔐 User Authentication | Login and registration with email/password validation |
+| 👥 Role-Based Access Control | Separate permissions for Admin and Member users |
+| 📚 Book Management | Add, search, borrow, return, and delete books |
+| 🛡️ Admin Protection | Add/Delete operations restricted to administrators |
+| 💾 Persistent Storage | Books and users saved using LocalStorage |
+| 📱 Responsive Design | Optimized for desktop, tablet, and mobile devices |
 
 ---
 
-## 🛠️ Tech Stack
+## 👤 User Roles
 
-| Technology | Purpose |
-|------------|---------|
-| HTML5 | Structure and semantic markup |
-| CSS3 | Styling with Flexbox and Grid |
-| Vanilla JavaScript | Application logic and DOM manipulation |
-| localStorage | Persistent browser storage |
-| Font Awesome 6 | Icons and UI enhancements |
+### 🛡️ Administrator
+
+**Default Credentials**
+
+```text
+Email: admin@lib.com
+Password: 1234
+```
+
+#### Permissions
+
+- Add new books
+- Delete books permanently
+- View all books
+- Search books
+- Borrow books
+- Return books
+
+---
+
+### 👨‍🎓 Member (Normal User)
+
+#### Registration
+
+Create an account using the registration form.
+
+#### Permissions
+
+- View all books
+- Search books by title or author
+- Borrow available books
+- Return issued books
+
+#### Restrictions
+
+❌ Cannot add books
+
+❌ Cannot delete books
 
 ---
 
 ## 📁 Project Structure
 
 ```text
-library-management-system/
+library-system/
 │
-├── index.html      # Main application file
+├── index.html      # Main HTML structure
+├── style.css       # Styling and responsive layout
+├── script.js       # Application logic and data handling
 └── README.md       # Project documentation
 ```
 
-> **Note:** This is a single-file application. All HTML, CSS, and JavaScript are embedded within `index.html` for simplicity and portability.
-
 ---
 
-## 🔧 How It Works
+## 🚀 How to Run
 
-### Data Model
+1. Download the following files:
 
-Each book is stored as a JavaScript object:
+   - `index.html`
+   - `style.css`
+   - `script.js`
 
-```javascript
-{
-  id: 1699999999999,
-  title: "Book Title",
-  author: "Author Name",
-  year: "2023",
-  isbn: "1234567890",
-  status: "Available"
-}
+2. Place all files in the same folder.
+
+3. Open:
+
+```text
+index.html
 ```
 
-### Local Storage
+4. Start using the application.
 
-All books are stored under the following key:
-
-```javascript
-libraryBooks
-```
-
-Data is automatically loaded whenever the application starts.
+> No server, package manager, or build process required.
 
 ---
 
 ## 🎮 Usage Guide
 
-### ➕ Adding a Book
+### First-Time Setup
 
-1. Fill in:
-   - Title
-   - Author
-   - Publication Year
-   - ISBN
+1. Launch the application.
+2. Log in using the administrator account:
 
-2. Click **Add Book**
+```text
+Email: admin@lib.com
+Password: 1234
+```
 
-3. The book appears in the collection with an **Available** status.
-
----
-
-### 🔍 Searching for Books
-
-1. Enter a keyword in the search bar.
-2. Press **Enter** or click **Search**.
-3. Matching books will be displayed instantly.
+3. Begin adding books to the library.
 
 ---
 
-### 📖 Borrowing a Book
+### 👤 Registering Members
 
-1. Locate an available book.
-2. Click the **Borrow** button.
-3. The status changes to **Issued**.
-
----
-
-### 🔄 Returning a Book
-
-1. Locate an issued book.
-2. Click the **Return** button.
-3. The status changes back to **Available**.
+1. Click **Create Account**.
+2. Enter:
+   - Full Name
+   - Email Address
+   - Password
+3. Click **Register Account**.
+4. Log in using the newly created credentials.
 
 ---
 
-### 🗑️ Deleting a Book
+## 📚 Managing Books
 
-1. Click the **Delete** icon.
-2. Confirm the deletion.
-3. The book is permanently removed.
+| Action | Instructions |
+|---------|-------------|
+| ➕ Add Book | Fill out the book form and click **Add Book** (Admin only) |
+| 🔍 Search | Enter a title or author name in the search field |
+| 📖 Borrow | Click **Borrow** on an available book |
+| 🔄 Return | Click **Return** on an issued book |
+| 🗑️ Delete | Click **Delete** on a book (Admin only) |
 
 ---
 
-## 🎨 UI Design
+## 🛡️ Security Improvements
 
-| Element | Color | Hex Code |
-|----------|--------|----------|
-| Primary Header | Dark Blue | `#2c3e50` |
-| Secondary Buttons | Blue | `#3498db` |
-| Delete / Danger | Red | `#e74c3c` |
-| Success / Available | Green | `#27ae60` |
-| Borrow Button | Orange | `#f39c12` |
-| Background | Light Gray | `#f4f4f4` |
+This version includes several security and usability enhancements:
+
+| Issue | Improvement |
+|---------|-------------|
+| Missing user tracking | Added `currentUser` global state |
+| Missing user display | Added user information display in header |
+| Hidden admin actions | Delete button only visible to admins |
+| Weak authorization | Function-level role checks in `addBook()` and `deleteBook()` |
+| Logout issues | Clears `currentUser` on logout |
+| Invalid input handling | Added `.trim()` validation on all user inputs |
+
+---
+
+## 💾 Data Storage
+
+The application uses **LocalStorage** for data persistence.
+
+### Storage Keys
+
+| Key | Purpose |
+|------|---------|
+| `libraryBooks` | Stores all book records |
+| `libraryUsers` | Stores registered user accounts |
+
+### Book Object Example
+
+```javascript
+{
+  id: 1699999999999,
+  title: "The Great Gatsby",
+  author: "F. Scott Fitzgerald",
+  year: "1925",
+  isbn: "9780743273565",
+  status: "Available"
+}
+```
+
+### User Object Example
+
+```javascript
+{
+  name: "John Doe",
+  email: "john@example.com",
+  password: "password123",
+  role: "member"
+}
+```
+
+> **Note:** Data persists between browser sessions but will be removed if LocalStorage or browser data is cleared.
+
+---
+
+## 🛠️ Technologies Used
+
+| Technology | Purpose |
+|------------|---------|
+| HTML5 | Semantic page structure |
+| CSS3 | Styling, Flexbox, Grid Layout, Variables |
+| JavaScript (ES6) | Application logic and event handling |
+| LocalStorage API | Persistent client-side storage |
+| Font Awesome 6 | Icons and visual enhancements |
+
+---
+
+## 🌐 Browser Compatibility
+
+Supported on all modern browsers:
+
+- ✅ Google Chrome
+- ✅ Microsoft Edge
+- ✅ Mozilla Firefox
+- ✅ Safari
+
+### Requirements
+
+- ES6 JavaScript support
+- LocalStorage support
 
 ---
 
 ## ⚠️ Limitations
 
+- Frontend-only application
+- Passwords are stored in LocalStorage (not encrypted)
 - No backend database
-- Storage limited by browser `localStorage` (~5–10 MB)
-- No user authentication
-- No data backup or synchronization
-- No ISBN validation
-- Single-user application
-- No borrowing history
+- No password recovery system
+- No multi-device synchronization
+- No activity or borrowing history
 
 ---
 
 ## 🔮 Future Enhancements
 
-- [ ] Export library data as JSON
-- [ ] Import library data from JSON
-- [ ] ISBN-10 and ISBN-13 validation
-- [ ] Book cover integration via APIs
-- [ ] Due dates and overdue reminders
-- [ ] User authentication system
-- [ ] Multi-user support
-- [ ] Sorting and filtering options
-- [ ] Pagination for large collections
-- [ ] Dark mode support
+- [ ] Password hashing and encryption
+- [ ] Backend database integration
+- [ ] User profile management
+- [ ] Borrowing history tracking
+- [ ] Book cover image support
+- [ ] Due dates and overdue notifications
+- [ ] Export/Import data
+- [ ] Multi-library support
+- [ ] Dark mode theme
+- [ ] Advanced filtering and sorting
 
 ---
 
@@ -222,12 +247,12 @@ Data is automatically loaded whenever the application starts.
 
 **Masud Ibn Musa**
 
-Built using HTML, CSS, JavaScript, and localStorage.
+Developed using HTML, CSS, JavaScript, and LocalStorage.
 
 ---
 
 ## 📜 License
 
-This project is licensed under the **MIT License**.
+This project is open-source and available for personal, educational, and commercial use.
 
-You are free to use, modify, and distribute this software for personal and commercial purposes.
+Feel free to use, modify, and distribute it as needed.
