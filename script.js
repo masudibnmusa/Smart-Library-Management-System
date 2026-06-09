@@ -1,6 +1,14 @@
 // --- DATA STORAGE (LocalStorage) ---
 let books = JSON.parse(localStorage.getItem('libraryBooks')) || [];
 let users = JSON.parse(localStorage.getItem('libraryUsers')) || [];
+
+// Migrate old books to new format (add borrowedBy/borrowedAt if missing)
+books = books.map(book => ({
+    ...book,
+    borrowedBy: book.borrowedBy || null,
+    borrowedAt: book.borrowedAt || null
+}));
+
 let currentUser = null;
 
 // --- UI ELEMENTS ---
@@ -62,6 +70,9 @@ function attemptRegister() {
     localStorage.setItem('libraryUsers', JSON.stringify(users));
 
     alert("Registration Successful!");
+    regName.value = '';
+    regEmail.value = '';
+    regPassword.value = '';
     switchToLogin();
 }
 
@@ -154,8 +165,13 @@ function addBook() {
 
     const newBook = {
         id: Date.now(), 
-        title, author, year, isbn,
-        status: 'Available'
+        title, 
+        author, 
+        year, 
+        isbn,
+        status: 'Available',
+        borrowedBy: null,
+        borrowedAt: null
     };
 
     books.push(newBook);
@@ -168,19 +184,43 @@ function addBook() {
 }
 
 function borrowBook(id) {
+    if (!currentUser) {
+        alert('Please log in to borrow books.');
+        return;
+    }
+    
     const book = books.find(b => b.id === id);
-    if (book) {
+    if (!book) return;
+    
+    if (book.status === 'Available') {
         book.status = 'Issued';
+        book.borrowedBy = currentUser.email;
+        book.borrowedAt = new Date().toLocaleString();
         saveAndRender();
+    } else {
+        alert('This book is already issued to someone else.');
     }
 }
 
 function returnBook(id) {
-    const book = books.find(b => b.id === id);
-    if (book) {
-        book.status = 'Available';
-        saveAndRender();
+    if (!currentUser) {
+        alert('Please log in to return books.');
+        return;
     }
+    
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    
+    // CRITICAL: Only borrower or admin can return
+    if (book.borrowedBy !== currentUser.email && currentUser.role !== 'Admin') {
+        alert('Access denied: Only the borrower or an admin can return this book.');
+        return;
+    }
+    
+    book.status = 'Available';
+    book.borrowedBy = null;
+    book.borrowedAt = null;
+    saveAndRender();
 }
 
 function deleteBook(id) {
@@ -189,7 +229,7 @@ function deleteBook(id) {
         return;
     }
 
-    if(confirm('Delete this book permanently?')) {
+    if (confirm('Delete this book permanently?')) {
         books = books.filter(b => b.id !== id);
         saveAndRender();
     }
@@ -206,7 +246,7 @@ function searchBooks() {
 
 function saveAndRender() {
     localStorage.setItem('libraryBooks', JSON.stringify(books));
-    if(searchInput.value) searchBooks();
+    if (searchInput.value) searchBooks();
     else renderBooks(books);
 }
 
@@ -227,15 +267,28 @@ function renderBooks(bookArray) {
 
         let actionButtonsHTML = '';
         
+        // BORROW: Show only if available
         if (book.status === 'Available') {
             actionButtonsHTML += `<button onclick="borrowBook(${book.id})" class="btn-warning"><i class="fas fa-hand-holding"></i> Borrow</button>`;
-        } else {
+        } 
+        // RETURN: Show only if current user is the borrower OR is admin
+        else if (book.borrowedBy === currentUser?.email || currentUser?.role === 'Admin') {
             actionButtonsHTML += `<button onclick="returnBook(${book.id})" style="background-color:var(--success-color)"><i class="fas fa-check"></i> Return</button>`;
+        } 
+        // ISSUED TO SOMEONE ELSE: Show disabled button
+        else {
+            actionButtonsHTML += `<button disabled style="background-color:#95a5a6; cursor:not-allowed"><i class="fas fa-lock"></i> Issued</button>`;
         }
 
+        // DELETE: Admin only
         if (currentUser && currentUser.role === 'Admin') {
             actionButtonsHTML += `<button onclick="deleteBook(${book.id})" class="btn-danger"><i class="fas fa-trash"></i> Delete</button>`;
         }
+
+        // Borrower info for issued books
+        const borrowerInfo = book.borrowedBy 
+            ? `<small style="color:#e74c3c; display:block; margin-top:5px;"><i class="fas fa-user"></i> Issued to: ${book.borrowedBy}</small>` 
+            : '';
 
         card.innerHTML = `
             <span class="status-badge ${statusClass}">${statusText}</span>
@@ -244,6 +297,7 @@ function renderBooks(bookArray) {
             <small><i class="fas fa-calendar-alt"></i> ${book.year}</small>
             <br>
             <strong>ISBN: </strong> <span style="font-family: monospace;">${book.isbn}</span>
+            ${borrowerInfo}
 
             <div class="action-btns">
                 ${actionButtonsHTML}
