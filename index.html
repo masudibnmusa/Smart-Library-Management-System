@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Management System</title>
+    <title>Library System - Login</title>
     <!-- Using FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -21,7 +21,75 @@
         body {
             background-color: var(--light-bg);
             color: #333;
+            height: 100vh;
+            overflow: hidden; /* Prevent scrolling on login screen */
+        }
+
+        /* ======================= 
+           LOGIN SCREEN STYLES 
+           ======================= */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), #3498db);
+            display: flex; /* Always visible initially */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 350px;
+        }
+
+        .login-logo {
+            font-size: 50px;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .login-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .login-inputs input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .btn-login {
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-login:hover { background-color: #1a252f; }
+        
+        .login-alert { color: var(--accent-color); margin-top: 10px; font-size: 0.9rem; display: none;}
+
+        /* ======================= 
+           SYSTEM INTERFACE STYLES (Initially Hidden)
+           ======================= */
+        #system-interface {
+            display: none; /* Hidden until logged in */
+            height: 100%;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .container {
@@ -38,6 +106,18 @@
             margin-bottom: 30px;
             border-bottom: 2px solid var(--primary-color);
             padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background-color: var(--accent-color);
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: white;
         }
 
         /* Form Styling */
@@ -69,7 +149,7 @@
             transition: 0.3s;
         }
 
-        button:hover { background-color: #2980b9; }
+        button:hover { filter: brightness(1.1); }
 
         /* Search Bar */
         .search-box {
@@ -99,8 +179,7 @@
 
         .status-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 10px; right: 10px;
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 0.8rem;
@@ -119,58 +198,87 @@
         .borrow-btn { background-color: #f39c12; }
         .return-btn { background-color: var(--success-color); }
         
-        /* Hide buttons based on status */
         .hide { display: none; }
 
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1><i class="fas fa-book-open"></i> Library Management System</h1>
-        <p>Add, Search, Borrow, and Return books.</p>
-    </header>
+    <!-- ======================= 
+         1. LOGIN SCREEN 
+         ======================= -->
+    <div id="login-screen">
+        <div class="login-card">
+            <div class="login-logo"><i class="fas fa-book-reader"></i></div>
+            <h2>Library Login</h2>
+            
+            <!-- Mock Credentials: Use admin / 1234 -->
+            <div class="login-inputs">
+                <input type="email" id="loginEmail" placeholder="Enter your username " value="admin@lib.com">
+                <input type="password" id="loginPassword" placeholder="Enter your password">
+            </div>
 
-    <!-- Section 1: Add Book -->
-    <div class="book-form">
-        <input type="text" id="titleInput" placeholder="Book Title">
-        <input type="text" id="authorInput" placeholder="Author Name">
-        <input type="number" id="yearInput" placeholder="Year (e.g., 2023)">
-        <input type="text" id="isbnInput" placeholder="ISBN Number">
-        <button onclick="addBook()">Add Book</button>
+            <button class="btn-login" onclick="attemptLogin()">Login</button>
+            <p id="loginError" class="login-alert">Invalid Credentials</p>
+        </div>
     </div>
 
-    <!-- Section 2: Search -->
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search by title or author...">
-        <button onclick="searchBooks()"><i class="fas fa-search"></i></button>
-    </div>
+    <!-- ======================= 
+         2. MAIN SYSTEM INTERFACE 
+         ======================= -->
+    <div id="system-interface">
+        <div class="container">
+            <header>
+                <div>
+                    <h1><i class="fas fa-book-open"></i> Library Dashboard</h1>
+                    <p>Welcome back!</p>
+                </div>
+                <!-- Logout Button -->
+                <button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </header>
 
-    <!-- Section 3: Book List -->
-    <h3>All Books</h3>
-    <br>
-    <div id="bookList" class="book-grid">
-        <!-- Books will be inserted here by JavaScript -->
+            <!-- Add Book Form -->
+            <div class="book-form">
+                <input type="text" id="titleInput" placeholder="Book Title">
+                <input type="text" id="authorInput" placeholder="Author Name">
+                <input type="number" id="yearInput" placeholder="Year (e.g., 2023)">
+                <input type="text" id="isbnInput" placeholder="ISBN Number">
+                <button onclick="addBook()">Add Book</button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by title or author...">
+                <button onclick="searchBooks()"><i class="fas fa-search"></i></button>
+            </div>
+
+            <!-- Books Grid -->
+            <h3>All Books</h3>
+            <br>
+            <div id="bookList" class="book-grid">
+                <!-- JS will inject books here -->
+            </div>
+        </div>
     </div>
-</div>
 
 <script>
-    // 1. Initialize Data (Check LocalStorage or start with empty array)
+    // --- System Data Logic ---
     let books = JSON.parse(localStorage.getItem('libraryBooks')) || [];
-
-    // DOM Elements
+    
+    const loginScreen = document.getElementById('login-screen');
+    const systemInterface = document.getElementById('system-interface');
     const titleInput = document.getElementById('titleInput');
     const authorInput = document.getElementById('authorInput');
     const yearInput = document.getElementById('yearInput');
     const isbnInput = document.getElementById('isbnInput');
     const searchInput = document.getElementById('searchInput');
     const bookList = document.getElementById('bookList');
+    const loginError = document.getElementById('loginError');
 
-    // Function to Render Books to the screen
+    // Function to Render Books
     function renderBooks(bookArray) {
-        bookList.innerHTML = ''; // Clear existing list
-
+        bookList.innerHTML = ''; 
+        
         if (bookArray.length === 0) {
             bookList.innerHTML = '<p>No books found. Add some above!</p>';
             return;
@@ -180,7 +288,6 @@
             const card = document.createElement('div');
             card.classList.add('book-card');
 
-            // Determine status HTML
             const statusClass = book.status === 'Available' ? 'status-available' : 'status-issued';
             const statusText = book.status === 'Available' ? 'Available' : 'Issued';
 
@@ -204,12 +311,10 @@
                     <button onclick="deleteBook(${book.id})" style="background-color:#e74c3c;"><i class="fas fa-trash"></i></button>
                 </div>
             `;
-            
             bookList.appendChild(card);
         });
     }
 
-    // Function: Add New Book
     function addBook() {
         const title = titleInput.value;
         const author = authorInput.value;
@@ -221,19 +326,18 @@
             return;
         }
 
-        // Create new book object
         const newBook = {
-            id: Date.now(), // Unique ID based on time
+            id: Date.now(), 
             title,
             author,
             year,
             isbn,
-            status: 'Available' // Default status
+            status: 'Available' 
         };
 
         books.push(newBook);
         saveAndRender();
-
+        
         // Clear inputs
         titleInput.value = '';
         authorInput.value = '';
@@ -241,7 +345,6 @@
         isbnInput.value = '';
     }
 
-    // Function: Borrow Book
     function borrowBook(id) {
         const book = books.find(b => b.id === id);
         if (book) {
@@ -250,7 +353,6 @@
         }
     }
 
-    // Function: Return Book
     function returnBook(id) {
         const book = books.find(b => b.id === id);
         if (book) {
@@ -259,7 +361,6 @@
         }
     }
 
-    // Function: Delete Book
     function deleteBook(id) {
         if(confirm('Are you sure you want to delete this book?')) {
             books = books.filter(b => b.id !== id);
@@ -267,7 +368,6 @@
         }
     }
 
-    // Function: Search Books
     function searchBooks() {
         const keyword = searchInput.value.toLowerCase();
         const filteredBooks = books.filter(book => 
@@ -277,10 +377,8 @@
         renderBooks(filteredBooks);
     }
 
-    // Helper: Save to LocalStorage and Re-render
     function saveAndRender() {
         localStorage.setItem('libraryBooks', JSON.stringify(books));
-        // If there's a search active, keep it. Otherwise render all.
         if(searchInput.value) {
             searchBooks();
         } else {
@@ -288,13 +386,34 @@
         }
     }
 
-    // Initial Render on Page Load
-    renderBooks(books);
+    // --- Authentication Logic ---
 
-    // Event Listener: Search on 'Enter' key
-    searchInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') searchBooks();
-    });
+    function attemptLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        // Mock Login Credentials: admin / 1234
+        if (email === "admin@lib.com" && password === "1234") {
+            loginScreen.style.display = 'none';
+            systemInterface.style.display = 'block';
+            document.body.style.overflow = 'auto'; // Allow scrolling inside the system
+            
+            renderBooks(books); // Load initial books
+        } else {
+            loginError.style.display = 'block';
+        }
+    }
+
+    function logout() {
+        // Reset fields
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        
+        systemInterface.style.display = 'none';
+        loginScreen.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        loginError.style.display = 'none';
+    }
 
 </script>
 
