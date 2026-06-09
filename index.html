@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library System - Login</title>
+    <title>Library System - Login & Register</title>
     <!-- Using FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -22,218 +22,159 @@
             background-color: var(--light-bg);
             color: #333;
             height: 100vh;
-            overflow: hidden; /* Prevent scrolling on login screen */
+            overflow-x: hidden;
         }
 
         /* ======================= 
-           LOGIN SCREEN STYLES 
+           AUTHENTICATION PAGES (Login & Register)
            ======================= */
-        #login-screen {
+        .auth-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, var(--primary-color), #3498db);
-            display: flex; /* Always visible initially */
+            display: flex; /* Shown initially */
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 2000;
         }
 
-        .login-card {
+        .auth-card {
             background: white;
             padding: 40px;
             border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            text-align: center;
-            width: 350px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            width: 380px;
         }
 
-        .login-logo {
-            font-size: 50px;
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-        }
+        .auth-logo { font-size: 50px; color: var(--secondary-color); margin-bottom: 10px; text-align: center; }
+        .auth-title { text-align: center; margin-bottom: 20px; font-weight: bold; color: var(--primary-color); }
 
-        .login-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .login-inputs input {
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            outline: none;
-        }
-
-        .btn-login {
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .btn-login:hover { background-color: #1a252f; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px; }
         
-        .login-alert { color: var(--accent-color); margin-top: 10px; font-size: 0.9rem; display: none;}
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #f9f9f9;}
+        
+        button.btn-primary {
+            width: 100%; padding: 12px; background-color: var(--secondary-color); color: white; 
+            border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px;
+        }
+        
+        button.btn-primary:hover { filter: brightness(1.1); }
+
+        .auth-alert { color: var(--accent-color); margin-top: 10px; font-size: 0.9rem; display: none;}
+        
+        .toggle-link { text-align: center; margin-top: 20px; font-size: 0.9rem; color: var(--secondary-color); cursor: pointer; }
 
         /* ======================= 
-           SYSTEM INTERFACE STYLES (Initially Hidden)
+           MAIN SYSTEM INTERFACE (Hidden Initially)
            ======================= */
         #system-interface {
-            display: none; /* Hidden until logged in */
+            display: none; 
             height: 100%;
             padding: 20px;
             overflow-y: auto;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 40px; height: 40px; background: var(--secondary-color); border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center;}
 
-        .logout-btn {
-            background-color: var(--accent-color);
-            padding: 5px 15px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            color: white;
-        }
-
-        /* Form Styling */
-        .book-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            background-color: var(--secondary-color);
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
+        .logout-btn { background-color: var(--accent-color); padding: 5px 15px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; color: white; }
+        
+        .book-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #ecf0f1; padding: 20px; border-radius: 5px; margin-bottom: 20px;}
+        button { padding: 10px 20px; border: none; background-color: var(--secondary-color); color: white; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; }
         button:hover { filter: brightness(1.1); }
 
-        /* Search Bar */
-        .search-box {
-            width: 100%;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* Book Grid Display */
-        .book-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .book-card {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            position: relative;
-            transition: transform 0.2s;
-        }
-
-        .book-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-
-        .status-badge {
-            position: absolute;
-            top: 10px; right: 10px;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            color: white;
-        }
-
+        .search-box { width: 100%; margin-bottom: 20px; display: flex; justify-content: space-between;}
+        
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;}
+        
+        .book-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; position: relative; transition: transform 0.2s;}
+        .book-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
+        
+        .status-badge { position: absolute; top: 10px; right: 10px; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; color: white;}
         .status-available { background-color: var(--success-color); }
         .status-issued { background-color: var(--accent-color); }
 
-        .action-btns {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-
+        .action-btns { margin-top: 15px; display: flex; gap: 10px;}
         .borrow-btn { background-color: #f39c12; }
         .return-btn { background-color: var(--success-color); }
-        
-        .hide { display: none; }
 
     </style>
 </head>
 <body>
 
     <!-- ======================= 
-         1. LOGIN SCREEN 
+         AUTH SCREEN (Login & Register)
          ======================= -->
-    <div id="login-screen">
-        <div class="login-card">
-            <div class="login-logo"><i class="fas fa-book-reader"></i></div>
-            <h2>Library Login</h2>
+    <div id="auth-screen" class="auth-container">
+        
+        <!-- Login Form -->
+        <div id="login-view" class="auth-card">
+            <div class="auth-logo"><i class="fas fa-book-reader"></i></div>
+            <h2 class="auth-title">Welcome Back!</h2>
             
-            <!-- Mock Credentials: Use admin / 1234 -->
-            <div class="login-inputs">
-                <input type="email" id="loginEmail" placeholder="Enter your username " value="admin@lib.com">
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="loginEmail" placeholder="Enter your registered email">
+            </div>
+            
+            <div class="input-group">
+                <label>Password</label>
                 <input type="password" id="loginPassword" placeholder="Enter your password">
             </div>
 
-            <button class="btn-login" onclick="attemptLogin()">Login</button>
-            <p id="loginError" class="login-alert">Invalid Credentials</p>
+            <button class="btn-primary" onclick="attemptLogin()">Login</button>
+            
+            <p id="loginError" class="auth-alert">Invalid Email or Password</p>
+            
+            <div class="toggle-link" onclick="switchToRegister()">Create Account</div>
         </div>
+
+        <!-- Register Form (Hidden Initially) -->
+        <div id="register-view" class="auth-card" style="display: none;">
+            <div class="auth-logo"><i class="fas fa-user-plus"></i></div>
+            <h2 class="auth-title">Create Account</h2>
+            
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="John Doe">
+            </div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="regEmail" placeholder="john@example.com">
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Create a password">
+            </div>
+
+            <button class="btn-primary" onclick="attemptRegister()">Register Account</button>
+            
+            <p id="regError" class="auth-alert" style="color:var(--accent-color)">Please fill all fields correctly.</p>
+
+            <div class="toggle-link" onclick="switchToLogin()">Already have an account? Login</div>
+        </div>
+
     </div>
 
     <!-- ======================= 
-         2. MAIN SYSTEM INTERFACE 
+         MAIN SYSTEM (Books & Admin Panel)
          ======================= -->
     <div id="system-interface">
         <div class="container">
             <header>
-                <div>
-                    <h1><i class="fas fa-book-open"></i> Library Dashboard</h1>
-                    <p>Welcome back!</p>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <h2><i class="fas fa-book-open"></i> Library Dashboard</h2>
+                    <div class="user-info" id="userInfoDisplay">
+                        <!-- User details appear here after login -->
+                    </div>
                 </div>
-                <!-- Logout Button -->
                 <button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </header>
 
@@ -246,13 +187,13 @@
                 <button onclick="addBook()">Add Book</button>
             </div>
 
-            <!-- Search Bar -->
+            <!-- Search -->
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search by title or author...">
                 <button onclick="searchBooks()"><i class="fas fa-search"></i></button>
             </div>
 
-            <!-- Books Grid -->
+            <!-- Book List -->
             <h3>All Books</h3>
             <br>
             <div id="bookList" class="book-grid">
@@ -262,25 +203,215 @@
     </div>
 
 <script>
-    // --- System Data Logic ---
+    // --- DATA STORAGE (LocalStorage) ---
     let books = JSON.parse(localStorage.getItem('libraryBooks')) || [];
-    
-    const loginScreen = document.getElementById('login-screen');
+    let users = JSON.parse(localStorage.getItem('libraryUsers')) || [];
+
+    // --- UI ELEMENTS ---
+    const authScreen = document.getElementById('auth-screen');
+    const loginView = document.getElementById('login-view');
+    const registerView = document.getElementById('register-view');
     const systemInterface = document.getElementById('system-interface');
+    
+    // Login Fields
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginError = document.getElementById('loginError');
+
+    // Register Fields
+    const regName = document.getElementById('regName');
+    const regEmail = document.getElementById('regEmail');
+    const regPassword = document.getElementById('regPassword');
+    const regError = document.getElementById('regError');
+
+    // Book Elements
     const titleInput = document.getElementById('titleInput');
     const authorInput = document.getElementById('authorInput');
     const yearInput = document.getElementById('yearInput');
     const isbnInput = document.getElementById('isbnInput');
     const searchInput = document.getElementById('searchInput');
     const bookList = document.getElementById('bookList');
-    const loginError = document.getElementById('loginError');
 
-    // Function to Render Books
+    // ======================= 
+    // AUTHENTICATION FUNCTIONS 
+    // ======================= 
+
+    // Switch between Login and Register views
+    function switchToRegister() {
+        loginView.style.display = 'none';
+        registerView.style.display = 'block';
+    }
+
+    function switchToLogin() {
+        registerView.style.display = 'none';
+        loginView.style.display = 'block';
+    }
+
+    // Register New User
+    function attemptRegister() {
+        const name = regName.value.trim();
+        const email = regEmail.value.trim().toLowerCase();
+        const password = regPassword.value;
+
+        if (!name || !email || !password) {
+            showError(regError, "Please fill in all fields.");
+            return;
+        }
+
+        // Check if user already exists
+        if (users.find(u => u.email === email)) {
+            showError(regError, "Account with this email already exists!");
+            return;
+        }
+
+        // Save User
+        const newUser = { id: Date.now(), name, email, password };
+        users.push(newUser);
+        localStorage.setItem('libraryUsers', JSON.stringify(users));
+
+        alert("Registration Successful! You can now login.");
+        switchToLogin();
+    }
+
+    // Login User (Admin & Normal Users)
+    function attemptLogin() {
+        const email = loginEmail.value.trim().toLowerCase();
+        const password = loginPassword.value;
+
+        // Check Admin First
+        if (email === "admin@lib.com" && password === "1234") {
+            alert("Welcome, Administrator! You can add/delete books.");
+            loginUser({ name: "Administrator", email: "admin@lib.com", role: "Admin" });
+            return;
+        }
+
+        // Check Normal User
+        const user = users.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+            alert("Welcome, " + user.name + "!");
+            loginUser({ name: user.name, email: user.email, role: "User" });
+        } else {
+            showError(loginError, "Invalid Email or Password.");
+        }
+    }
+
+    // Helper to show error messages
+    function showError(element, message) {
+        element.innerText = message;
+        element.style.display = 'block';
+        setTimeout(() => element.style.display = 'none', 3000);
+    }
+
+    // ======================= 
+    // SYSTEM FUNCTIONS (Books)
+    // ======================= 
+
+    function loginUser(userObj) {
+        // Hide Auth Screen, Show System
+        authScreen.style.display = 'none';
+        systemInterface.style.display = 'block';
+        
+        // Update Header User Info
+        const userDisplay = document.getElementById('userInfoDisplay');
+        userDisplay.innerHTML = `
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+            <div>
+                <strong>${userObj.name}</strong><br>
+                <small style="color:var(--primary-color)">${userObj.role} Account</small>
+            </div>
+        `;
+
+        renderBooks(books); // Load initial books
+    }
+
+    function logout() {
+        // Reset Inputs
+        loginEmail.value = '';
+        loginPassword.value = '';
+        
+        systemInterface.style.display = 'none';
+        authScreen.style.display = 'flex';
+    }
+
+    // --- Book System Logic (Admin & User functions are the same, Admin can do more in future) ---
+
+    function addBook() {
+        const title = titleInput.value;
+        const author = authorInput.value;
+        const year = yearInput.value;
+        const isbn = isbnInput.value;
+
+        if (title === '' || author === '' || year === '' || isbn === '') {
+            alert('Please fill in all fields!');
+            return;
+        }
+
+        const newBook = {
+            id: Date.now(), 
+            title,
+            author,
+            year,
+            isbn,
+            status: 'Available' // Books start as Available
+        };
+
+        books.push(newBook);
+        saveAndRender();
+        
+        // Clear inputs
+        titleInput.value = '';
+        authorInput.value = '';
+        yearInput.value = '';
+        isbnInput.value = '';
+    }
+
+    function borrowBook(id) {
+        const book = books.find(b => b.id === id);
+        if (book) {
+            book.status = 'Issued';
+            saveAndRender();
+        }
+    }
+
+    function returnBook(id) {
+        const book = books.find(b => b.id === id);
+        if (book) {
+            book.status = 'Available';
+            saveAndRender();
+        }
+    }
+
+    function deleteBook(id) {
+        if(confirm('Delete this book permanently?')) {
+            books = books.filter(b => b.id !== id);
+            saveAndRender();
+        }
+    }
+
+    function searchBooks() {
+        const keyword = searchInput.value.toLowerCase();
+        const filteredBooks = books.filter(book => 
+            book.title.toLowerCase().includes(keyword) || 
+            book.author.toLowerCase().includes(keyword)
+        );
+        renderBooks(filteredBooks);
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('libraryBooks', JSON.stringify(books));
+        if(searchInput.value) {
+            searchBooks();
+        } else {
+            renderBooks(books);
+        }
+    }
+
     function renderBooks(bookArray) {
         bookList.innerHTML = ''; 
         
         if (bookArray.length === 0) {
-            bookList.innerHTML = '<p>No books found. Add some above!</p>';
+            bookList.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#7f8c8d;">No books found.</p>';
             return;
         }
 
@@ -311,110 +442,10 @@
                     <button onclick="deleteBook(${book.id})" style="background-color:#e74c3c;"><i class="fas fa-trash"></i></button>
                 </div>
             `;
+            
             bookList.appendChild(card);
         });
     }
-
-    function addBook() {
-        const title = titleInput.value;
-        const author = authorInput.value;
-        const year = yearInput.value;
-        const isbn = isbnInput.value;
-
-        if (title === '' || author === '' || year === '' || isbn === '') {
-            alert('Please fill in all fields!');
-            return;
-        }
-
-        const newBook = {
-            id: Date.now(), 
-            title,
-            author,
-            year,
-            isbn,
-            status: 'Available' 
-        };
-
-        books.push(newBook);
-        saveAndRender();
-        
-        // Clear inputs
-        titleInput.value = '';
-        authorInput.value = '';
-        yearInput.value = '';
-        isbnInput.value = '';
-    }
-
-    function borrowBook(id) {
-        const book = books.find(b => b.id === id);
-        if (book) {
-            book.status = 'Issued';
-            saveAndRender();
-        }
-    }
-
-    function returnBook(id) {
-        const book = books.find(b => b.id === id);
-        if (book) {
-            book.status = 'Available';
-            saveAndRender();
-        }
-    }
-
-    function deleteBook(id) {
-        if(confirm('Are you sure you want to delete this book?')) {
-            books = books.filter(b => b.id !== id);
-            saveAndRender();
-        }
-    }
-
-    function searchBooks() {
-        const keyword = searchInput.value.toLowerCase();
-        const filteredBooks = books.filter(book => 
-            book.title.toLowerCase().includes(keyword) || 
-            book.author.toLowerCase().includes(keyword)
-        );
-        renderBooks(filteredBooks);
-    }
-
-    function saveAndRender() {
-        localStorage.setItem('libraryBooks', JSON.stringify(books));
-        if(searchInput.value) {
-            searchBooks();
-        } else {
-            renderBooks(books);
-        }
-    }
-
-    // --- Authentication Logic ---
-
-    function attemptLogin() {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-
-        // Mock Login Credentials: admin / 1234
-        if (email === "admin@lib.com" && password === "1234") {
-            loginScreen.style.display = 'none';
-            systemInterface.style.display = 'block';
-            document.body.style.overflow = 'auto'; // Allow scrolling inside the system
-            
-            renderBooks(books); // Load initial books
-        } else {
-            loginError.style.display = 'block';
-        }
-    }
-
-    function logout() {
-        // Reset fields
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        
-        systemInterface.style.display = 'none';
-        loginScreen.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        loginError.style.display = 'none';
-    }
-
 </script>
 
 </body>
