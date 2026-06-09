@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library System - Login & Register</title>
-    <!-- Using FontAwesome for Icons -->
+    <title>Library System - Secure</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
@@ -25,24 +24,14 @@
             overflow-x: hidden;
         }
 
-        /* ======================= 
-           AUTHENTICATION PAGES (Login & Register)
-           ======================= */
         .auth-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, var(--primary-color), #3498db);
-            display: flex; /* Shown initially */
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
+            display: flex; justify-content: center; align-items: center; z-index: 2000;
         }
 
         .auth-card {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             width: 380px;
         }
 
@@ -54,25 +43,14 @@
         
         input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #f9f9f9;}
         
-        button.btn-primary {
-            width: 100%; padding: 12px; background-color: var(--secondary-color); color: white; 
-            border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px;
-        }
-        
+        button.btn-primary { width: 100%; padding: 12px; background-color: var(--secondary-color); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         button.btn-primary:hover { filter: brightness(1.1); }
 
         .auth-alert { color: var(--accent-color); margin-top: 10px; font-size: 0.9rem; display: none;}
-        
         .toggle-link { text-align: center; margin-top: 20px; font-size: 0.9rem; color: var(--secondary-color); cursor: pointer; }
 
-        /* ======================= 
-           MAIN SYSTEM INTERFACE (Hidden Initially)
-           ======================= */
         #system-interface {
-            display: none; 
-            height: 100%;
-            padding: 20px;
-            overflow-y: auto;
+            display: none; height: 100%; padding: 20px; overflow-y: auto;
         }
 
         .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
@@ -81,9 +59,9 @@
         
         .user-info { display: flex; align-items: center; gap: 10px; }
         .user-avatar { width: 40px; height: 40px; background: var(--secondary-color); border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center;}
-
-        .logout-btn { background-color: var(--accent-color); padding: 5px 15px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; color: white; }
         
+        .logout-btn { background-color: var(--accent-color); padding: 5px 15px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; color: white; }
+
         .book-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #ecf0f1; padding: 20px; border-radius: 5px; margin-bottom: 20px;}
         button { padding: 10px 20px; border: none; background-color: var(--secondary-color); color: white; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; }
         button:hover { filter: brightness(1.1); }
@@ -100,22 +78,19 @@
         .status-issued { background-color: var(--accent-color); }
 
         .action-btns { margin-top: 15px; display: flex; gap: 10px;}
-        .borrow-btn { background-color: #f39c12; }
-        .return-btn { background-color: var(--success-color); }
+        
+        .btn-danger { background-color: #e74c3c; }
+        .btn-warning { background-color: #f39c12; }
 
     </style>
 </head>
 <body>
 
-    <!-- ======================= 
-         AUTH SCREEN (Login & Register)
-         ======================= -->
     <div id="auth-screen" class="auth-container">
         
-        <!-- Login Form -->
         <div id="login-view" class="auth-card">
             <div class="auth-logo"><i class="fas fa-book-reader"></i></div>
-            <h2 class="auth-title">Welcome Back!</h2>
+            <h2 class="auth-title">Library Login</h2>
             
             <div class="input-group">
                 <label>Email Address</label>
@@ -134,7 +109,6 @@
             <div class="toggle-link" onclick="switchToRegister()">Create Account</div>
         </div>
 
-        <!-- Register Form (Hidden Initially) -->
         <div id="register-view" class="auth-card" style="display: none;">
             <div class="auth-logo"><i class="fas fa-user-plus"></i></div>
             <h2 class="auth-title">Create Account</h2>
@@ -163,23 +137,23 @@
 
     </div>
 
-    <!-- ======================= 
-         MAIN SYSTEM (Books & Admin Panel)
-         ======================= -->
     <div id="system-interface">
         <div class="container">
             <header>
                 <div style="display:flex; align-items:center; gap:10px;">
                     <h2><i class="fas fa-book-open"></i> Library Dashboard</h2>
-                    <div class="user-info" id="userInfoDisplay">
-                        <!-- User details appear here after login -->
+                    <div id="roleBadge" style="padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; color: white;">
+                        User
                     </div>
                 </div>
+                
+                <!-- Added missing userInfoDisplay element -->
+                <div id="userInfoDisplay" class="user-info"></div>
+                
                 <button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </header>
 
-            <!-- Add Book Form -->
-            <div class="book-form">
+            <div id="admin-form" class="book-form">
                 <input type="text" id="titleInput" placeholder="Book Title">
                 <input type="text" id="authorInput" placeholder="Author Name">
                 <input type="number" id="yearInput" placeholder="Year (e.g., 2023)">
@@ -187,17 +161,14 @@
                 <button onclick="addBook()">Add Book</button>
             </div>
 
-            <!-- Search -->
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search by title or author...">
                 <button onclick="searchBooks()"><i class="fas fa-search"></i></button>
             </div>
 
-            <!-- Book List -->
             <h3>All Books</h3>
             <br>
             <div id="bookList" class="book-grid">
-                <!-- JS will inject books here -->
             </div>
         </div>
     </div>
@@ -206,6 +177,7 @@
     // --- DATA STORAGE (LocalStorage) ---
     let books = JSON.parse(localStorage.getItem('libraryBooks')) || [];
     let users = JSON.parse(localStorage.getItem('libraryUsers')) || [];
+    let currentUser = null;  // <-- TRACK LOGGED IN USER
 
     // --- UI ELEMENTS ---
     const authScreen = document.getElementById('auth-screen');
@@ -213,30 +185,25 @@
     const registerView = document.getElementById('register-view');
     const systemInterface = document.getElementById('system-interface');
     
-    // Login Fields
     const loginEmail = document.getElementById('loginEmail');
     const loginPassword = document.getElementById('loginPassword');
     const loginError = document.getElementById('loginError');
 
-    // Register Fields
     const regName = document.getElementById('regName');
     const regEmail = document.getElementById('regEmail');
     const regPassword = document.getElementById('regPassword');
     const regError = document.getElementById('regError');
 
-    // Book Elements
     const titleInput = document.getElementById('titleInput');
     const authorInput = document.getElementById('authorInput');
     const yearInput = document.getElementById('yearInput');
     const isbnInput = document.getElementById('isbnInput');
     const searchInput = document.getElementById('searchInput');
     const bookList = document.getElementById('bookList');
+    
+    const roleBadge = document.getElementById('roleBadge');
+    const adminForm = document.getElementById('admin-form');
 
-    // ======================= 
-    // AUTHENTICATION FUNCTIONS 
-    // ======================= 
-
-    // Switch between Login and Register views
     function switchToRegister() {
         loginView.style.display = 'none';
         registerView.style.display = 'block';
@@ -247,7 +214,6 @@
         loginView.style.display = 'block';
     }
 
-    // Register New User
     function attemptRegister() {
         const name = regName.value.trim();
         const email = regEmail.value.trim().toLowerCase();
@@ -258,61 +224,51 @@
             return;
         }
 
-        // Check if user already exists
         if (users.find(u => u.email === email)) {
             showError(regError, "Account with this email already exists!");
             return;
         }
 
-        // Save User
-        const newUser = { id: Date.now(), name, email, password };
+        const newUser = { id: Date.now(), name, email, password, role: 'User' };
         users.push(newUser);
         localStorage.setItem('libraryUsers', JSON.stringify(users));
 
-        alert("Registration Successful! You can now login.");
+        alert("Registration Successful!");
         switchToLogin();
     }
 
-    // Login User (Admin & Normal Users)
     function attemptLogin() {
         const email = loginEmail.value.trim().toLowerCase();
         const password = loginPassword.value;
 
-        // Check Admin First
         if (email === "admin@lib.com" && password === "1234") {
-            alert("Welcome, Administrator! You can add/delete books.");
+            alert("Welcome, Administrator! You have full access.");
             loginUser({ name: "Administrator", email: "admin@lib.com", role: "Admin" });
             return;
         }
 
-        // Check Normal User
         const user = users.find(u => u.email === email && u.password === password);
         
         if (user) {
             alert("Welcome, " + user.name + "!");
-            loginUser({ name: user.name, email: user.email, role: "User" });
+            loginUser({ name: user.name, email: user.email, role: user.role });
         } else {
             showError(loginError, "Invalid Email or Password.");
         }
     }
 
-    // Helper to show error messages
     function showError(element, message) {
         element.innerText = message;
         element.style.display = 'block';
         setTimeout(() => element.style.display = 'none', 3000);
     }
 
-    // ======================= 
-    // SYSTEM FUNCTIONS (Books)
-    // ======================= 
-
     function loginUser(userObj) {
-        // Hide Auth Screen, Show System
+        currentUser = userObj;  // <-- STORE CURRENT USER
+        
         authScreen.style.display = 'none';
         systemInterface.style.display = 'block';
         
-        // Update Header User Info
         const userDisplay = document.getElementById('userInfoDisplay');
         userDisplay.innerHTML = `
             <div class="user-avatar"><i class="fas fa-user"></i></div>
@@ -322,25 +278,43 @@
             </div>
         `;
 
-        renderBooks(books); // Load initial books
+        if (userObj.role === 'Admin') {
+            roleBadge.innerText = "Administrator";
+            roleBadge.style.backgroundColor = "#e74c3c";
+            adminForm.style.display = "grid";
+        } else {
+            roleBadge.innerText = "Member";
+            roleBadge.style.backgroundColor = "#27ae60";
+            adminForm.style.display = "none";
+        }
+
+        renderBooks(books); 
     }
 
     function logout() {
-        // Reset Inputs
+        currentUser = null;  // <-- CLEAR CURRENT USER
+        
         loginEmail.value = '';
         loginPassword.value = '';
-        
-        systemInterface.style.display = 'none';
         authScreen.style.display = 'flex';
+        systemInterface.style.display = 'none';
     }
 
-    // --- Book System Logic (Admin & User functions are the same, Admin can do more in future) ---
+    // ======================= 
+    // BOOK SYSTEM LOGIC - WITH ROLE CHECKS
+    // ======================= 
 
     function addBook() {
-        const title = titleInput.value;
-        const author = authorInput.value;
-        const year = yearInput.value;
-        const isbn = isbnInput.value;
+        // BLOCK NON-ADMINS
+        if (!currentUser || currentUser.role !== 'Admin') {
+            alert('Access denied: Only administrators can add books.');
+            return;
+        }
+
+        const title = titleInput.value.trim();
+        const author = authorInput.value.trim();
+        const year = yearInput.value.trim();
+        const isbn = isbnInput.value.trim();
 
         if (title === '' || author === '' || year === '' || isbn === '') {
             alert('Please fill in all fields!');
@@ -349,20 +323,16 @@
 
         const newBook = {
             id: Date.now(), 
-            title,
-            author,
-            year,
-            isbn,
-            status: 'Available' // Books start as Available
+            title, author, year, isbn,
+            status: 'Available'
         };
 
         books.push(newBook);
         saveAndRender();
         
-        // Clear inputs
-        titleInput.value = '';
-        authorInput.value = '';
-        yearInput.value = '';
+        titleInput.value = ''; 
+        authorInput.value = ''; 
+        yearInput.value = ''; 
         isbnInput.value = '';
     }
 
@@ -383,6 +353,12 @@
     }
 
     function deleteBook(id) {
+        // BLOCK NON-ADMINS
+        if (!currentUser || currentUser.role !== 'Admin') {
+            alert('Access denied: Only administrators can delete books.');
+            return;
+        }
+
         if(confirm('Delete this book permanently?')) {
             books = books.filter(b => b.id !== id);
             saveAndRender();
@@ -400,11 +376,8 @@
 
     function saveAndRender() {
         localStorage.setItem('libraryBooks', JSON.stringify(books));
-        if(searchInput.value) {
-            searchBooks();
-        } else {
-            renderBooks(books);
-        }
+        if(searchInput.value) searchBooks();
+        else renderBooks(books);
     }
 
     function renderBooks(bookArray) {
@@ -422,6 +395,19 @@
             const statusClass = book.status === 'Available' ? 'status-available' : 'status-issued';
             const statusText = book.status === 'Available' ? 'Available' : 'Issued';
 
+            let actionButtonsHTML = '';
+            
+            if (book.status === 'Available') {
+                actionButtonsHTML += `<button onclick="borrowBook(${book.id})" class="btn-warning"><i class="fas fa-hand-holding"></i> Borrow</button>`;
+            } else {
+                actionButtonsHTML += `<button onclick="returnBook(${book.id})" style="background-color:var(--success-color)"><i class="fas fa-check"></i> Return</button>`;
+            }
+
+            // SHOW DELETE BUTTON ONLY FOR ADMINS
+            if (currentUser && currentUser.role === 'Admin') {
+                actionButtonsHTML += `<button onclick="deleteBook(${book.id})" class="btn-danger"><i class="fas fa-trash"></i> Delete</button>`;
+            }
+
             card.innerHTML = `
                 <span class="status-badge ${statusClass}">${statusText}</span>
                 <h2>${book.title}</h2>
@@ -431,15 +417,7 @@
                 <strong>ISBN: </strong> <span style="font-family: monospace;">${book.isbn}</span>
 
                 <div class="action-btns">
-                    ${book.status === 'Available' 
-                        ? `<button onclick="borrowBook(${book.id})" class="borrow-btn"><i class="fas fa-hand-holding"></i> Borrow</button>` 
-                        : ''}
-                    
-                    ${book.status === 'Issued' 
-                        ? `<button onclick="returnBook(${book.id})" class="return-btn"><i class="fas fa-check"></i> Return</button>` 
-                        : ''}
-
-                    <button onclick="deleteBook(${book.id})" style="background-color:#e74c3c;"><i class="fas fa-trash"></i></button>
+                    ${actionButtonsHTML}
                 </div>
             `;
             
