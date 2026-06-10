@@ -1,17 +1,15 @@
-// --- DATA STORAGE (LocalStorage) ---
-let books = JSON.parse(localStorage.getItem('libraryBooks')) || [];
-let users = JSON.parse(localStorage.getItem('libraryUsers')) || [];
+// ============================================
+// API CONFIGURATION
+// ============================================
+const API_URL = 'http://localhost:5000/api';
 
-// Migrate old books to new format (add borrowedBy/borrowedAt if missing)
-books = books.map(book => ({
-    ...book,
-    borrowedBy: book.borrowedBy || null,
-    borrowedAt: book.borrowedAt || null
-}));
-
+// Store JWT token
+let authToken = localStorage.getItem('libraryToken') || null;
 let currentUser = null;
 
-// --- UI ELEMENTS ---
+// ============================================
+// UI ELEMENTS
+// ============================================
 const authScreen = document.getElementById('auth-screen');
 const loginView = document.getElementById('login-view');
 const registerView = document.getElementById('register-view');
@@ -36,9 +34,42 @@ const bookList = document.getElementById('bookList');
 const roleBadge = document.getElementById('roleBadge');
 const adminForm = document.getElementById('admin-form');
 
-// ======================= 
-// AUTHENTICATION FUNCTIONS 
-// ======================= 
+// ============================================
+// API HELPER
+// ============================================
+async function apiCall(endpoint, options = {}) {
+    const url = `${API_URL}${endpoint}`;
+    
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+        },
+        ...options
+    };
+
+    if (config.body && typeof config.body === 'object') {
+        config.body = JSON.stringify(config.body);
+    }
+
+    try {
+        const response = await fetch(url, config);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Something went wrong');
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
+}
+
+// ============================================
+// AUTHENTICATION FUNCTIONS
+// ============================================
 
 function switchToRegister() {
     loginView.style.display = 'none';
@@ -50,7 +81,7 @@ function switchToLogin() {
     loginView.style.display = 'block';
 }
 
-function attemptRegister() {
+async function attemptRegister() {
     const name = regName.value.trim();
     const email = regEmail.value.trim().toLowerCase();
     const password = regPassword.value;
@@ -60,39 +91,46 @@ function attemptRegister() {
         return;
     }
 
-    if (users.find(u => u.email === email)) {
-        showError(regError, "Account with this email already exists!");
-        return;
+    try {
+        const data = await apiCall('/auth/register', {
+            method: 'POST',
+            body: { name, email, password }
+        });
+
+        alert("Registration Successful! Please login.");
+        regName.value = '';
+        regEmail.value = '';
+        regPassword.value = '';
+        switchToLogin();
+    } catch (error) {
+        showError(regError, error.message);
     }
-
-    const newUser = { id: Date.now(), name, email, password, role: 'User' };
-    users.push(newUser);
-    localStorage.setItem('libraryUsers', JSON.stringify(users));
-
-    alert("Registration Successful!");
-    regName.value = '';
-    regEmail.value = '';
-    regPassword.value = '';
-    switchToLogin();
 }
 
-function attemptLogin() {
+async function attemptLogin() {
     const email = loginEmail.value.trim().toLowerCase();
     const password = loginPassword.value;
 
-    if (email === "admin@lib.com" && password === "1234") {
-        alert("Welcome, Administrator! You have full access.");
-        loginUser({ name: "Administrator", email: "admin@lib.com", role: "Admin" });
+    if (!email || !password) {
+        showError(loginError, "Please fill in all fields.");
         return;
     }
 
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (user) {
-        alert("Welcome, " + user.name + "!");
-        loginUser({ name: user.name, email: user.email, role: user.role });
-    } else {
-        showError(loginError, "Invalid Email or Password.");
+    try {
+        const data = await apiCall('/auth/login', {
+            method: 'POST',
+            body: { email, password }
+        });
+
+        // Save token
+        authToken = data.data.token;
+        localStorage.setItem('libraryToken', authToken);
+        currentUser = data.data.user;
+
+        alert(data.message);
+        loginUser(currentUser);
+    } catch (error) {
+        showError(loginError, error.message);
     }
 }
 
@@ -102,11 +140,11 @@ function showError(element, message) {
     setTimeout(() => element.style.display = 'none', 3000);
 }
 
-// ======================= 
+// ============================================
 // LOGIN & ROLE MANAGEMENT
-// ======================= 
+// ============================================
 
-function loginUser(userObj) {
+async function loginUser(userObj) {
     currentUser = userObj;
     
     authScreen.style.display = 'none';
@@ -131,11 +169,13 @@ function loginUser(userObj) {
         adminForm.style.display = "none";
     }
 
-    renderBooks(books); 
+    await fetchBooks();
 }
 
 function logout() {
     currentUser = null;
+    authToken = null;
+    localStorage.removeItem('libraryToken');
     
     loginEmail.value = '';
     loginPassword.value = '';
@@ -143,11 +183,11 @@ function logout() {
     systemInterface.style.display = 'none';
 }
 
-// ======================= 
-// BOOK SYSTEM LOGIC
-// ======================= 
+// ============================================
+// BOOK SYSTEM LOGIC (API CONNECTED)
+// ============================================
 
-function addBook() {
+async function addBook() {
     if (!currentUser || currentUser.role !== 'Admin') {
         alert('Access denied: Only administrators can add books.');
         return;
@@ -163,97 +203,94 @@ function addBook() {
         return;
     }
 
-    const newBook = {
-        id: Date.now(), 
-        title, 
-        author, 
-        year, 
-        isbn,
-        status: 'Available',
-        borrowedBy: null,
-        borrowedAt: null
-    };
+    try {
+        await apiCall('/books', {
+            method: 'POST',
+            body: { title, author, year, isbn }
+        });
 
-    books.push(newBook);
-    saveAndRender();
-    
-    titleInput.value = ''; 
-    authorInput.value = ''; 
-    yearInput.value = ''; 
-    isbnInput.value = '';
+        alert('Book added successfully!');
+        titleInput.value = ''; 
+        authorInput.value = ''; 
+        yearInput.value = ''; 
+        isbnInput.value = '';
+        
+        await fetchBooks();
+    } catch (error) {
+        alert(error.message);
+    }
 }
 
-function borrowBook(id) {
+async function borrowBook(id) {
     if (!currentUser) {
         alert('Please log in to borrow books.');
         return;
     }
-    
-    const book = books.find(b => b.id === id);
-    if (!book) return;
-    
-    if (book.status === 'Available') {
-        book.status = 'Issued';
-        book.borrowedBy = currentUser.email;
-        book.borrowedAt = new Date().toLocaleString();
-        saveAndRender();
-    } else {
-        alert('This book is already issued to someone else.');
+
+    try {
+        await apiCall(`/books/${id}/borrow`, {
+            method: 'POST'
+        });
+        await fetchBooks();
+    } catch (error) {
+        alert(error.message);
     }
 }
 
-function returnBook(id) {
+async function returnBook(id) {
     if (!currentUser) {
         alert('Please log in to return books.');
         return;
     }
-    
-    const book = books.find(b => b.id === id);
-    if (!book) return;
-    
-    // CRITICAL: Only borrower or admin can return
-    if (book.borrowedBy !== currentUser.email && currentUser.role !== 'Admin') {
-        alert('Access denied: Only the borrower or an admin can return this book.');
-        return;
+
+    try {
+        await apiCall(`/books/${id}/return`, {
+            method: 'POST'
+        });
+        await fetchBooks();
+    } catch (error) {
+        alert(error.message);
     }
-    
-    book.status = 'Available';
-    book.borrowedBy = null;
-    book.borrowedAt = null;
-    saveAndRender();
 }
 
-function deleteBook(id) {
+async function deleteBook(id) {
     if (!currentUser || currentUser.role !== 'Admin') {
         alert('Access denied: Only administrators can delete books.');
         return;
     }
 
-    if (confirm('Delete this book permanently?')) {
-        books = books.filter(b => b.id !== id);
-        saveAndRender();
+    if (!confirm('Delete this book permanently?')) return;
+
+    try {
+        await apiCall(`/books/${id}`, {
+            method: 'DELETE'
+        });
+        await fetchBooks();
+    } catch (error) {
+        alert(error.message);
     }
 }
 
-function searchBooks() {
-    const keyword = searchInput.value.toLowerCase();
-    const filteredBooks = books.filter(book => 
-        book.title.toLowerCase().includes(keyword) || 
-        book.author.toLowerCase().includes(keyword)
-    );
-    renderBooks(filteredBooks);
+async function searchBooks() {
+    const keyword = searchInput.value.trim();
+    await fetchBooks(keyword);
 }
 
-function saveAndRender() {
-    localStorage.setItem('libraryBooks', JSON.stringify(books));
-    if (searchInput.value) searchBooks();
-    else renderBooks(books);
+async function fetchBooks(search = '') {
+    try {
+        const endpoint = search ? `/books?search=${encodeURIComponent(search)}` : '/books';
+        const data = await apiCall(endpoint);
+        renderBooks(data.data);
+    } catch (error) {
+        console.error('Failed to fetch books:', error);
+        bookList.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#e74c3c;">Failed to load books. Is the server running?</p>';
+    }
 }
 
 function renderBooks(bookArray) {
     bookList.innerHTML = ''; 
     
-    if (bookArray.length === 0) {
+    if (!bookArray || bookArray.length === 0) {
         bookList.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#7f8c8d;">No books found.</p>';
         return;
     }
@@ -262,13 +299,13 @@ function renderBooks(bookArray) {
         const card = document.createElement('div');
         card.classList.add('book-card');
 
-        const statusClass = book.status === 'Available' ? 'status-available' : 'status-issued';
-        const statusText = book.status === 'Available' ? 'Available' : 'Issued';
+        const statusClass = book.status === 'AVAILABLE' || book.status === 'Available' ? 'status-available' : 'status-issued';
+        const statusText = book.status === 'AVAILABLE' || book.status === 'Available' ? 'Available' : 'Issued';
 
         let actionButtonsHTML = '';
         
         // BORROW: Show only if available
-        if (book.status === 'Available') {
+        if (book.status === 'AVAILABLE' || book.status === 'Available') {
             actionButtonsHTML += `<button onclick="borrowBook(${book.id})" class="btn-warning"><i class="fas fa-hand-holding"></i> Borrow</button>`;
         } 
         // RETURN: Show only if current user is the borrower OR is admin
@@ -307,3 +344,23 @@ function renderBooks(bookArray) {
         bookList.appendChild(card);
     });
 }
+
+// ============================================
+// AUTO-LOGIN ON PAGE LOAD
+// ============================================
+async function checkAuth() {
+    if (!authToken) return;
+    
+    try {
+        const data = await apiCall('/auth/me');
+        currentUser = data.data;
+        loginUser(currentUser);
+    } catch (error) {
+        // Token invalid, clear it
+        localStorage.removeItem('libraryToken');
+        authToken = null;
+    }
+}
+
+// Check if already logged in
+checkAuth();
