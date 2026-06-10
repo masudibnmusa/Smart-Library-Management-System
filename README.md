@@ -1,19 +1,39 @@
 # 📚 Library Management System
 
-A secure, role-based Library Management System built with **HTML5**, **CSS3**, and **Vanilla JavaScript**. The system provides user authentication, role-based access control, book management, and persistent browser storage using `localStorage`.
+A secure, role-based Library Management System with a **Node.js/Express backend API** and a **vanilla JavaScript frontend**.
+
+---
+
+## 🏗️ Architecture
+
+```text
+┌─────────────┐      REST API (JSON)      ┌─────────────┐
+│  Frontend   │  ←────────────────────→  │   Backend   │
+│ (HTML/CSS/  │     JWT Bearer Token      │ (Node.js/   │
+│    JS)      │                          │  Express)   │
+└─────────────┘                          └─────────────┘
+        │
+        ▼
+┌─────────────┐
+│ PostgreSQL  │
+│   (Prisma)  │
+└─────────────┘
+```
 
 ---
 
 ## ✨ Features
 
 | Feature | Description |
-|----------|-------------|
-| 🔐 User Authentication | Login and registration with email/password validation |
-| 👥 Role-Based Access Control | Separate permissions for Admin and Member users |
+|---------|-------------|
+| 🔐 User Authentication | Register/login with JWT tokens and bcrypt password hashing |
+| 👥 Role-Based Access Control | Admin and Member roles with different permissions |
 | 📚 Book Management | Add, search, borrow, return, and delete books |
-| 🛡️ Admin Protection | Add/Delete operations restricted to administrators |
-| 💾 Persistent Storage | Books and users saved using LocalStorage |
-| 📱 Responsive Design | Optimized for desktop, tablet, and mobile devices |
+| 🛡️ Ownership Protection | Only borrower or admin can return a book |
+| 🔒 Admin Protection | Server-side enforcement for sensitive actions |
+| 💾 Persistent Storage | PostgreSQL database with Prisma ORM |
+| 👨‍👩‍👧‍👦 Concurrent Users | Multiple users supported simultaneously |
+| 📱 Responsive Design | Works across desktop and mobile devices |
 
 ---
 
@@ -21,42 +41,46 @@ A secure, role-based Library Management System built with **HTML5**, **CSS3**, a
 
 ### 🛡️ Administrator
 
-**Default Credentials**
-
-```text
-Email: admin@lib.com
-Password: 1234
-```
+- **Email:** `admin@lib.com`
+- **Password:** `1234` (set via `.env` or seed script)
 
 #### Permissions
-
 - Add new books
 - Delete books permanently
 - View all books
-- Search books
-- Borrow books
-- Return books
+- Borrow/return any book
 
 ---
 
-### 👨‍🎓 Member (Normal User)
+### 👨‍🎓 Member
 
 #### Registration
-
-Create an account using the registration form.
+Users can register via the sign-up form.
 
 #### Permissions
-
 - View all books
-- Search books by title or author
+- Search books
 - Borrow available books
-- Return issued books
+- Return only their borrowed books
+- View book status
 
 #### Restrictions
+❌ Cannot add books  
+❌ Cannot delete books  
+❌ Cannot return others' books  
 
-❌ Cannot add books
+---
 
-❌ Cannot delete books
+## 🧰 Tech Stack
+
+| Layer | Technology |
+|------|-------------|
+| Frontend | HTML5, CSS3, Vanilla JavaScript, FontAwesome |
+| Backend | Node.js, Express.js |
+| Database | PostgreSQL |
+| ORM | Prisma |
+| Authentication | JWT, bcryptjs |
+| Validation | express-validator |
 
 ---
 
@@ -65,181 +89,241 @@ Create an account using the registration form.
 ```text
 library-system/
 │
-├── index.html      # Main HTML structure
-├── style.css       # Styling and responsive layout
-├── script.js       # Application logic and data handling
-└── README.md       # Project documentation
+├── backend/
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   └── seed.js
+│   │
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── database.js
+│   │   ├── controllers/
+│   │   │   ├── authController.js
+│   │   │   └── bookController.js
+│   │   ├── middleware/
+│   │   │   ├── auth.js
+│   │   │   └── errorHandler.js
+│   │   ├── routes/
+│   │   │   ├── authRoutes.js
+│   │   │   └── bookRoutes.js
+│   │   ├── utils/
+│   │   │   └── asyncHandler.js
+│   │   └── server.js
+│   │
+│   ├── .env
+│   ├── .env.example
+│   ├── .gitignore
+│   └── package.json
+│
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+└── README.md
 ```
 
 ---
 
-## 🚀 How to Run
+## 🚀 Quick Start
 
-1. Download the following files:
+### 📌 Prerequisites
 
-   - `index.html`
-   - `style.css`
-   - `script.js`
+- Node.js (v18+)
+- PostgreSQL
+- npm or yarn
 
-2. Place all files in the same folder.
+---
 
-3. Open:
+## 1️⃣ Backend Setup
 
+```bash
+cd backend
+npm install
+
+cp .env.example .env
+# Configure database credentials in .env
+
+npx prisma migrate dev --name init
+
+npm run db:seed
+
+npm run dev
+```
+
+Backend runs at:
 ```text
-index.html
+http://localhost:5000
 ```
-
-4. Start using the application.
-
-> No server, package manager, or build process required.
 
 ---
 
-## 🎮 Usage Guide
+## 2️⃣ Frontend Setup
 
-### First-Time Setup
+```bash
+cd frontend
+```
 
-1. Launch the application.
-2. Log in using the administrator account:
-
+### Option 1: Open directly
 ```text
-Email: admin@lib.com
-Password: 1234
+open index.html
 ```
 
-3. Begin adding books to the library.
+### Option 2: Live Server
+```bash
+npx serve .
+```
+
+Frontend runs at:
+```text
+http://localhost:3000
+```
 
 ---
 
-### 👤 Registering Members
+## 🔗 API Configuration
 
-1. Click **Create Account**.
-2. Enter:
-   - Full Name
-   - Email Address
-   - Password
-3. Click **Register Account**.
-4. Log in using the newly created credentials.
-
----
-
-## 📚 Managing Books
-
-| Action | Instructions |
-|---------|-------------|
-| ➕ Add Book | Fill out the book form and click **Add Book** (Admin only) |
-| 🔍 Search | Enter a title or author name in the search field |
-| 📖 Borrow | Click **Borrow** on an available book |
-| 🔄 Return | Click **Return** on an issued book |
-| 🗑️ Delete | Click **Delete** on a book (Admin only) |
-
----
-
-## 🛡️ Security Improvements
-
-This version includes several security and usability enhancements:
-
-| Issue | Improvement |
-|---------|-------------|
-| Missing user tracking | Added `currentUser` global state |
-| Missing user display | Added user information display in header |
-| Hidden admin actions | Delete button only visible to admins |
-| Weak authorization | Function-level role checks in `addBook()` and `deleteBook()` |
-| Logout issues | Clears `currentUser` on logout |
-| Invalid input handling | Added `.trim()` validation on all user inputs |
-
----
-
-## 💾 Data Storage
-
-The application uses **LocalStorage** for data persistence.
-
-### Storage Keys
-
-| Key | Purpose |
-|------|---------|
-| `libraryBooks` | Stores all book records |
-| `libraryUsers` | Stores registered user accounts |
-
-### Book Object Example
+In `frontend/script.js`:
 
 ```javascript
-{
-  id: 1699999999999,
-  title: "The Great Gatsby",
-  author: "F. Scott Fitzgerald",
-  year: "1925",
-  isbn: "9780743273565",
-  status: "Available"
+const API_URL = 'http://localhost:5000/api';
+```
+
+---
+
+## ⚙️ Environment Variables
+
+```env
+PORT=5000
+NODE_ENV=development
+
+DATABASE_URL="postgresql://user:password@localhost:5432/library_db?schema=public"
+
+JWT_SECRET=your-super-secret-key
+JWT_EXPIRES_IN=7d
+
+ADMIN_EMAIL=admin@lib.com
+ADMIN_PASSWORD=1234
+```
+
+---
+
+## 🔌 API Endpoints
+
+### 🔐 Authentication
+
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| POST | /api/auth/register | Public | Create account |
+| POST | /api/auth/login | Public | Login user |
+| GET | /api/auth/me | Private | Get current user |
+
+---
+
+### 📚 Books
+
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | /api/books | Private | Get all books |
+| POST | /api/books | Admin | Add book |
+| DELETE | /api/books/:id | Admin | Delete book |
+| POST | /api/books/:id/borrow | Private | Borrow book |
+| POST | /api/books/:id/return | Owner/Admin | Return book |
+| GET | /api/books/my-borrows | Private | My borrow history |
+
+---
+
+## 🔒 Security Features
+
+| Feature | Implementation |
+|---------|---------------|
+| Password Hashing | bcrypt (10 rounds) |
+| Authentication | JWT tokens |
+| Authorization | Role-based middleware |
+| Ownership Check | Server-side validation |
+| Input Validation | express-validator |
+| SQL Protection | Prisma ORM |
+| CORS | Configured for frontend |
+
+---
+
+## 🗄️ Database Schema
+
+```prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(USER)
+  borrows   BorrowRecord[]
+  createdAt DateTime @default(now())
+}
+
+model Book {
+  id        Int      @id @default(autoincrement())
+  title     String
+  author    String
+  year      String
+  isbn      String   @unique
+  status    Status   @default(AVAILABLE)
+  borrows   BorrowRecord[]
+}
+
+model BorrowRecord {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  bookId     Int
+  borrowedAt DateTime @default(now())
+  returnedAt DateTime?
 }
 ```
 
-### User Object Example
+---
 
-```javascript
-{
-  name: "John Doe",
-  email: "john@example.com",
-  password: "password123",
-  role: "member"
-}
+## 🎨 Frontend Features
+
+- Auto-login using JWT (localStorage)
+- Role-based UI rendering
+- Admin-only controls
+- Real-time API search
+- Borrower visibility system
+- Conditional button rendering
+
+---
+
+## 🚀 Deployment
+
+### Backend (Railway / Render / Heroku)
+
+```bash
+npm install && npx prisma migrate deploy && npm run db:seed
+npm start
 ```
 
-> **Note:** Data persists between browser sessions but will be removed if LocalStorage or browser data is cleared.
+### Frontend (Vercel / Netlify / GitHub Pages)
+
+- Static deployment supported
+- Update `API_URL`
+- Enable backend CORS
 
 ---
 
-## 🛠️ Technologies Used
+## 🧯 Troubleshooting
 
-| Technology | Purpose |
-|------------|---------|
-| HTML5 | Semantic page structure |
-| CSS3 | Styling, Flexbox, Grid Layout, Variables |
-| JavaScript (ES6) | Application logic and event handling |
-| LocalStorage API | Persistent client-side storage |
-| Font Awesome 6 | Icons and visual enhancements |
-
----
-
-## 🌐 Browser Compatibility
-
-Supported on all modern browsers:
-
-- ✅ Google Chrome
-- ✅ Microsoft Edge
-- ✅ Mozilla Firefox
-- ✅ Safari
-
-### Requirements
-
-- ES6 JavaScript support
-- LocalStorage support
+| Issue | Fix |
+|------|-----|
+| Cannot load books | Check backend is running |
+| CORS error | Fix CLIENT_URL in .env |
+| DB not found | Run Prisma migration |
+| Admin login fails | Run seed script |
+| Token expired | Re-login |
 
 ---
 
-## ⚠️ Limitations
+## 📜 License
 
-- Frontend-only application
-- Passwords are stored in LocalStorage (not encrypted)
-- No backend database
-- No password recovery system
-- No multi-device synchronization
-- No activity or borrowing history
-
----
-
-## 🔮 Future Enhancements
-
-- [ ] Password hashing and encryption
-- [ ] Backend database integration
-- [ ] User profile management
-- [ ] Borrowing history tracking
-- [ ] Book cover image support
-- [ ] Due dates and overdue notifications
-- [ ] Export/Import data
-- [ ] Multi-library support
-- [ ] Dark mode theme
-- [ ] Advanced filtering and sorting
+Open source — free to use, modify, and distribute.
 
 ---
 
@@ -247,12 +331,5 @@ Supported on all modern browsers:
 
 **Masud Ibn Musa**
 
-Developed using HTML, CSS, JavaScript, and LocalStorage.
-
----
-
-## 📜 License
-
-This project is open-source and available for personal, educational, and commercial use.
-
-Feel free to use, modify, and distribute it as needed.
+Built with Node.js, Express, PostgreSQL, and Vanilla JavaScript.
+```
