@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library System - Secure</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="auth-screen" class="auth-container">
+        
+        <div id="login-view" class="auth-card">
+            <div class="auth-logo"><i class="fas fa-book-reader"></i></div>
+            <h2 class="auth-title">Library Login</h2>
+            
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="loginEmail" placeholder="Enter your registered email">
+            </div>
+            
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
+            </div>
+
+            <button class="btn-primary" onclick="attemptLogin()">Login</button>
+            
+            <p id="loginError" class="auth-alert">Invalid Email or Password</p>
+            
+            <div class="toggle-link" onclick="switchToRegister()">Create Account</div>
+        </div>
+
+        <div id="register-view" class="auth-card" style="display: none;">
+            <div class="auth-logo"><i class="fas fa-user-plus"></i></div>
+            <h2 class="auth-title">Create Account</h2>
+            
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="John Doe">
+            </div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="regEmail" placeholder="john@example.com">
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Create a password">
+            </div>
+
+            <button class="btn-primary" onclick="attemptRegister()">Register Account</button>
+            
+            <p id="regError" class="auth-alert">Please fill all fields correctly.</p>
+
+            <div class="toggle-link" onclick="switchToLogin()">Already have an account? Login</div>
+        </div>
+
+    </div>
+
+    <div id="system-interface">
+        <div class="container">
+            <header>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <h2><i class="fas fa-book-open"></i> Library Dashboard</h2>
+                    <div id="roleBadge">User</div>
+                </div>
+                
+                <div id="userInfoDisplay" class="user-info"></div>
+                
+                <button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </header>
+
+            <div id="admin-form" class="book-form">
+                <input type="text" id="titleInput" placeholder="Book Title">
+                <input type="text" id="authorInput" placeholder="Author Name">
+                <input type="number" id="yearInput" placeholder="Year (e.g., 2023)">
+                <input type="text" id="isbnInput" placeholder="ISBN Number">
+                <button onclick="addBook()">Add Book</button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by title or author...">
+                <button onclick="searchBooks()"><i class="fas fa-search"></i></button>
+            </div>
+
+            <h3>All Books</h3>
+            <br>
+            <div id="bookList" class="book-grid"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
