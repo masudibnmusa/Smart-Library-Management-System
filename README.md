@@ -289,6 +289,7 @@ model BorrowRecord {
 - Real-time API search
 - Borrower visibility system
 - Conditional button rendering
+- Dark Mode toggle with LocalStorage persistence
 
 ---
 
