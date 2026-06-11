@@ -7,6 +7,9 @@ const API_URL = 'http://localhost:5000/api';
 let authToken = localStorage.getItem('libraryToken') || null;
 let currentUser = null;
 
+// Helper to check if admin
+const isAdmin = (user) => user && (user.role === 'Admin' || user.role === 'ADMIN');
+
 // ============================================
 // UI ELEMENTS
 // ============================================
@@ -159,7 +162,8 @@ async function loginUser(userObj) {
         </div>
     `;
 
-    if (userObj.role === 'Admin') {
+    // FIXED: Check for both 'Admin' and 'ADMIN'
+    if (isAdmin(userObj)) {
         roleBadge.innerText = "Administrator";
         roleBadge.style.backgroundColor = "#e74c3c";
         adminForm.style.display = "grid";
@@ -188,7 +192,8 @@ function logout() {
 // ============================================
 
 async function addBook() {
-    if (!currentUser || currentUser.role !== 'Admin') {
+    // FIXED: Use isAdmin helper
+    if (!isAdmin(currentUser)) {
         alert('Access denied: Only administrators can add books.');
         return;
     }
@@ -254,7 +259,8 @@ async function returnBook(id) {
 }
 
 async function deleteBook(id) {
-    if (!currentUser || currentUser.role !== 'Admin') {
+    // FIXED: Use isAdmin helper
+    if (!isAdmin(currentUser)) {
         alert('Access denied: Only administrators can delete books.');
         return;
     }
@@ -309,7 +315,8 @@ function renderBooks(bookArray) {
             actionButtonsHTML += `<button onclick="borrowBook(${book.id})" class="btn-warning"><i class="fas fa-hand-holding"></i> Borrow</button>`;
         } 
         // RETURN: Show only if current user is the borrower OR is admin
-        else if (book.borrowedBy === currentUser?.email || currentUser?.role === 'Admin') {
+        // FIXED: Use isAdmin helper
+        else if (book.borrowedBy === currentUser?.email || isAdmin(currentUser)) {
             actionButtonsHTML += `<button onclick="returnBook(${book.id})" style="background-color:var(--success-color)"><i class="fas fa-check"></i> Return</button>`;
         } 
         // ISSUED TO SOMEONE ELSE: Show disabled button
@@ -318,7 +325,8 @@ function renderBooks(bookArray) {
         }
 
         // DELETE: Admin only
-        if (currentUser && currentUser.role === 'Admin') {
+        // FIXED: Use isAdmin helper
+        if (isAdmin(currentUser)) {
             actionButtonsHTML += `<button onclick="deleteBook(${book.id})" class="btn-danger"><i class="fas fa-trash"></i> Delete</button>`;
         }
 
