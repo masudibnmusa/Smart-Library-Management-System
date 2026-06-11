@@ -7,9 +7,9 @@ A secure, role-based Library Management System with a **Node.js/Express backend 
 ## 🏗️ Architecture
 
 ```text
-┌─────────────┐      REST API (JSON)      ┌─────────────┐
+┌─────────────┐      REST API (JSON)     ┌─────────────┐
 │  Frontend   │  ←────────────────────→  │   Backend   │
-│ (HTML/CSS/  │     JWT Bearer Token      │ (Node.js/   │
+│ (HTML/CSS/  │     JWT Bearer Token     │ (Node.js/   │
 │    JS)      │                          │  Express)   │
 └─────────────┘                          └─────────────┘
         │
