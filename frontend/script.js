@@ -38,6 +38,34 @@ const roleBadge = document.getElementById('roleBadge');
 const adminForm = document.getElementById('admin-form');
 
 // ============================================
+// THEME MANAGEMENT
+// ============================================
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeIcon(next);
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+        icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+}
+
+// Initialize theme on load
+initTheme();
+
+// ============================================
 // API HELPER
 // ============================================
 async function apiCall(endpoint, options = {}) {
@@ -125,7 +153,6 @@ async function attemptLogin() {
             body: { email, password }
         });
 
-        // Save token
         authToken = data.data.token;
         localStorage.setItem('libraryToken', authToken);
         currentUser = data.data.user;
@@ -162,14 +189,13 @@ async function loginUser(userObj) {
         </div>
     `;
 
-    // FIXED: Check for both 'Admin' and 'ADMIN'
     if (isAdmin(userObj)) {
         roleBadge.innerText = "Administrator";
-        roleBadge.style.backgroundColor = "#e74c3c";
+        roleBadge.style.backgroundColor = "var(--badge-admin)";
         adminForm.style.display = "grid";
     } else {
         roleBadge.innerText = "Member";
-        roleBadge.style.backgroundColor = "#27ae60";
+        roleBadge.style.backgroundColor = "var(--badge-user)";
         adminForm.style.display = "none";
     }
 
@@ -192,7 +218,6 @@ function logout() {
 // ============================================
 
 async function addBook() {
-    // FIXED: Use isAdmin helper
     if (!isAdmin(currentUser)) {
         alert('Access denied: Only administrators can add books.');
         return;
@@ -259,7 +284,6 @@ async function returnBook(id) {
 }
 
 async function deleteBook(id) {
-    // FIXED: Use isAdmin helper
     if (!isAdmin(currentUser)) {
         alert('Access denied: Only administrators can delete books.');
         return;
@@ -289,7 +313,7 @@ async function fetchBooks(search = '') {
         renderBooks(data.data);
     } catch (error) {
         console.error('Failed to fetch books:', error);
-        bookList.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#e74c3c;">Failed to load books. Is the server running?</p>';
+        bookList.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--accent-color);">Failed to load books. Is the server running?</p>';
     }
 }
 
@@ -297,7 +321,7 @@ function renderBooks(bookArray) {
     bookList.innerHTML = ''; 
     
     if (!bookArray || bookArray.length === 0) {
-        bookList.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#7f8c8d;">No books found.</p>';
+        bookList.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--text-muted);">No books found.</p>';
         return;
     }
 
@@ -310,29 +334,20 @@ function renderBooks(bookArray) {
 
         let actionButtonsHTML = '';
         
-        // BORROW: Show only if available
         if (book.status === 'AVAILABLE' || book.status === 'Available') {
-            actionButtonsHTML += `<button onclick="borrowBook(${book.id})" class="btn-warning"><i class="fas fa-hand-holding"></i> Borrow</button>`;
-        } 
-        // RETURN: Show only if current user is the borrower OR is admin
-        // FIXED: Use isAdmin helper
-        else if (book.borrowedBy === currentUser?.email || isAdmin(currentUser)) {
-            actionButtonsHTML += `<button onclick="returnBook(${book.id})" style="background-color:var(--success-color)"><i class="fas fa-check"></i> Return</button>`;
-        } 
-        // ISSUED TO SOMEONE ELSE: Show disabled button
-        else {
-            actionButtonsHTML += `<button disabled style="background-color:#95a5a6; cursor:not-allowed"><i class="fas fa-lock"></i> Issued</button>`;
+            actionButtonsHTML += `<button type="button" onclick="borrowBook(${book.id})" class="btn-warning"><i class="fas fa-hand-holding"></i> Borrow</button>`;
+        } else if (book.borrowedBy === currentUser?.email || isAdmin(currentUser)) {
+            actionButtonsHTML += `<button type="button" onclick="returnBook(${book.id})" style="background-color:var(--success-color)"><i class="fas fa-check"></i> Return</button>`;
+        } else {
+            actionButtonsHTML += `<button type="button" disabled><i class="fas fa-lock"></i> Issued</button>`;
         }
 
-        // DELETE: Admin only
-        // FIXED: Use isAdmin helper
         if (isAdmin(currentUser)) {
-            actionButtonsHTML += `<button onclick="deleteBook(${book.id})" class="btn-danger"><i class="fas fa-trash"></i> Delete</button>`;
+            actionButtonsHTML += `<button type="button" onclick="deleteBook(${book.id})" class="btn-danger"><i class="fas fa-trash"></i> Delete</button>`;
         }
 
-        // Borrower info for issued books
         const borrowerInfo = book.borrowedBy 
-            ? `<small style="color:#e74c3c; display:block; margin-top:5px;"><i class="fas fa-user"></i> Issued to: ${book.borrowedBy}</small>` 
+            ? `<small style="color:var(--accent-color); display:block; margin-top:5px;"><i class="fas fa-user"></i> Issued to: ${book.borrowedBy}</small>` 
             : '';
 
         card.innerHTML = `
@@ -341,7 +356,7 @@ function renderBooks(bookArray) {
             <p><i class="fas fa-user"></i> ${book.author}</p>
             <small><i class="fas fa-calendar-alt"></i> ${book.year}</small>
             <br>
-            <strong>ISBN: </strong> <span style="font-family: monospace;">${book.isbn}</span>
+            <strong>ISBN: </strong> <span style="font-family: monospace;">">${book.isbn}</span>
             ${borrowerInfo}
 
             <div class="action-btns">
@@ -364,11 +379,10 @@ async function checkAuth() {
         currentUser = data.data;
         loginUser(currentUser);
     } catch (error) {
-        // Token invalid, clear it
         localStorage.removeItem('libraryToken');
         authToken = null;
     }
 }
 
-// Check if already logged in
+// Initialize
 checkAuth();
